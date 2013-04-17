@@ -4,6 +4,11 @@ This is a little app that trys to find a possible way to make the playoffs for a
 
 ## TODO
 
+* Parse the teams
+* Find the _shortest_ path to playoffs for a given team
+* Buffalo will make the playoffs
+
+## Completed
+
 * Load schedule from file
-* Parse file
-* Find the "shortest path to playoffs for a given team"
+* Parse schedule
