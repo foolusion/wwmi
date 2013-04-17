@@ -151,7 +151,7 @@ func readTeams(filename string) error {
 		if err != nil {
 			return err
 		}
-		team.RegulationLosses, err = strconv.Atoi(teamString[4])
+		team.RegulationLosses, err = strconv.Atoi(teamString[6])
 		if err != nil {
 			return err
 		}
@@ -159,14 +159,11 @@ func readTeams(filename string) error {
 		if err != nil {
 			return err
 		}
-		team.ShootoutLosses, err = strconv.Atoi(teamString[6])
+		team.ShootoutLosses, err = strconv.Atoi(teamString[4])
 		if err != nil {
 			return err
 		}
-		team.Points, err = strconv.Atoi(teamString[7])
-		if err != nil {
-			return err
-		}
+		team.Points = team.RegulationsWins * 2 + team.OvertimeWins * 2 + team.ShootoutWins * 2 + team.ShootoutLosses + team.OvertimeLosses
 		teams[team.Name] = team
 	}
 	return err
