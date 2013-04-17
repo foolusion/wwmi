@@ -4,17 +4,21 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
 // The master schedule
 var schedule []Game
 
+// The master team list
+var teams map[string]Team
+
 // A specific game
 type Game struct {
 	Date time.Time
-	Away *Team
-	Home *Team
+	Away string
+	Home string
 	Result
 }
 
@@ -54,7 +58,7 @@ func readSchedule(filename string) error {
 	reader := bufio.NewReader(file)
 
 	for err != nil {
-		line, err := reader.ReadLine('\n')
+		line, err := reader.ReadString('\n')
 
 		game := Game{}
 		// Split line into game values
@@ -69,6 +73,7 @@ func readSchedule(filename string) error {
 		game.Home = gameString[2]
 
 		// Add game to Schedule
-		append(schedule, game)
+		schedule = append(schedule, game)
 	}
+	return err
 }
