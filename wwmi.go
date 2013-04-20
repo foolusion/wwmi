@@ -55,9 +55,18 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	err = readTeams("teams.dat")
+	if err != nil {
+		fmt.Println(err)
+	}
 	for _, v := range schedule {
 		if v.Date.After(time.Now()) {
 			fmt.Printf("%v at %v, %v\n", v.Away, v.Home, v.Date)
+		}
+	}
+	for _, v := range teams {
+		if v.RegulationWins > 20 {
+			fmt.Printf("%v has %v Regulation wins.\n", v.Name, v.RegulationWins)
 		}
 	}
 }
@@ -163,7 +172,7 @@ func readTeams(filename string) error {
 		if err != nil {
 			return err
 		}
-		team.Points = team.RegulationsWins * 2 + team.OvertimeWins * 2 + team.ShootoutWins * 2 + team.ShootoutLosses + team.OvertimeLosses
+		team.Points = team.RegulationWins*2 + team.OvertimeWins*2 + team.ShootoutWins*2 + team.ShootoutLosses + team.OvertimeLosses
 		teams[team.Name] = team
 	}
 	return err
