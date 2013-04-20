@@ -26,6 +26,8 @@ type Game struct {
 // A representation of a team.
 type Team struct {
 	Name             string
+	Division         string
+	Conference       string
 	RegulationWins   int
 	OvertimeWins     int
 	ShootoutWins     int
@@ -61,14 +63,38 @@ func main() {
 	}
 	for _, v := range schedule {
 		if v.Date.After(time.Now()) {
-			fmt.Printf("%v at %v, %v\n", v.Away, v.Home, v.Date)
+			fmt.Printf("%v at %v, %v\n", strings.Title(v.Away), strings.Title(v.Home), v.Date)
 		}
 	}
 	for _, v := range teams {
 		if v.RegulationWins > 20 {
-			fmt.Printf("%v has %v Regulation wins.\n", v.Name, v.RegulationWins)
+			fmt.Printf("%v in %v division of %v conference has %v regulation wins.\n",
+				strings.Title(v.Name),
+				strings.ToUpper(v.Division),
+				strings.Title(v.Conference),
+				v.RegulationWins)
 		}
 	}
+
+	WillWeMakeIt("buffalo")
+
+	for _, v := range teams {
+		fmt.Printf("%v has %v regulation wins.\n", strings.Title(v.Name), v.RegulationWins)
+	}
+}
+
+func WillWeMakeIt(team string) {
+	// a star?
+	// for each game
+	// 	add all possibilities to open list
+	//	sort them based on score
+	//	pick best
+	//	repeat until goal is met
+	// GOAL:	* in 8th place or better
+	//		* for all teams in conference lower
+	//			* games left * max points < wwmi points
+
+	fmt.Println("NO!!!!")
 }
 
 func readSchedule(filename string) error {
@@ -147,28 +173,30 @@ func readTeams(filename string) error {
 		teamString := strings.Split(line, "\t")
 
 		team := Team{}
-		team.Name = teamString[0]
-		team.RegulationWins, err = strconv.Atoi(teamString[1])
+		team.Name = strings.ToLower(teamString[0])
+		team.Division = strings.ToLower(teamString[1])
+		team.Conference = strings.ToLower(teamString[2])
+		team.RegulationWins, err = strconv.Atoi(teamString[3])
 		if err != nil {
 			return err
 		}
-		team.OvertimeWins, err = strconv.Atoi(teamString[2])
+		team.OvertimeWins, err = strconv.Atoi(teamString[4])
 		if err != nil {
 			return err
 		}
-		team.ShootoutWins, err = strconv.Atoi(teamString[3])
+		team.ShootoutWins, err = strconv.Atoi(teamString[5])
 		if err != nil {
 			return err
 		}
-		team.RegulationLosses, err = strconv.Atoi(teamString[6])
+		team.RegulationLosses, err = strconv.Atoi(teamString[8])
 		if err != nil {
 			return err
 		}
-		team.OvertimeLosses, err = strconv.Atoi(teamString[5])
+		team.OvertimeLosses, err = strconv.Atoi(teamString[7])
 		if err != nil {
 			return err
 		}
-		team.ShootoutLosses, err = strconv.Atoi(teamString[4])
+		team.ShootoutLosses, err = strconv.Atoi(teamString[6])
 		if err != nil {
 			return err
 		}
