@@ -10,7 +10,7 @@ import (
 )
 
 // The master schedule
-var schedule []Game
+var games []Game
 
 // The master team list
 var teams map[string]Team
@@ -47,7 +47,7 @@ type Result struct {
 }
 
 func init() {
-	schedule = make([]Game, 0, 100)
+	games = make([]Game, 0, 100)
 	teams = make(map[string]Team)
 }
 
@@ -61,40 +61,62 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	for _, v := range schedule {
-		if v.Date.After(time.Now()) {
-			fmt.Printf("%v at %v, %v\n", strings.Title(v.Away), strings.Title(v.Home), v.Date)
-		}
-	}
-	for _, v := range teams {
-		if v.RegulationWins > 20 {
-			fmt.Printf("%v in %v division of %v conference has %v regulation wins.\n",
-				strings.Title(v.Name),
-				strings.ToUpper(v.Division),
-				strings.Title(v.Conference),
-				v.RegulationWins)
-		}
-	}
 
 	WillWeMakeIt("buffalo")
+}
+
+// a star?
+// for each game
+// 	add all possibilities to open list
+//	sort them based on score
+//	pick best
+//	repeat until goal is met
+// GOAL:	* in 8th place or better
+//		* for all teams in conference lower
+//			* games left * max points < wwmi points
+func WillWeMakeIt(team string) {
+	wwmi := teams[team]
+
+	if wwmi.Conference == "east" {
+		removeTeamsByConference("west")
+		removeGamesByConference("west")
+	} else {
+		removeTeamsByConference("east")
+		removeGamesByConference("east")
+	}
+
+	fmt.Println("NO!!!!")
 
 	for _, v := range teams {
-		fmt.Printf("%v has %v regulation wins.\n", strings.Title(v.Name), v.RegulationWins)
+		fmt.Printf("%v, %v\n", strings.Title(v.Name), v.Points)
+	}
+
+	for _, g := range games {
+		if g.Date.After(time.Now()) {
+			fmt.Printf("%v at %v, %v\n", strings.Title(g.Away), strings.Title(g.Home), g.Date)
+		}
 	}
 }
 
-func WillWeMakeIt(team string) {
-	// a star?
-	// for each game
-	// 	add all possibilities to open list
-	//	sort them based on score
-	//	pick best
-	//	repeat until goal is met
-	// GOAL:	* in 8th place or better
-	//		* for all teams in conference lower
-	//			* games left * max points < wwmi points
+func removeTeamsByConference(conf string) {
+	for i := range teams {
+		if teams[i].Conference == conf {
+			delete(teams, i)
+		}
+	}
+}
 
-	fmt.Println("NO!!!!")
+func removeGamesByConference(conf string) {
+	for i := 0; i < len(games); {
+		if v, ok := teams[games[i].Away]; !ok {
+			games = append(games[:i], games[i+1:]...)
+		} else if v.Conference == conf {
+			fmt.Println(games[i])
+			games = append(games[:i], games[i+1:]...)
+		} else {
+			i++
+		}
+	}
 }
 
 func readSchedule(filename string) error {
@@ -134,11 +156,11 @@ func readSchedule(filename string) error {
 			return err
 		}
 		// Add teams to game
-		game.Away = gameString[1]
-		game.Home = gameString[2]
+		game.Away = strings.ToLower(gameString[1])
+		game.Home = strings.ToLower(gameString[2])
 
 		// Add game to Schedule
-		schedule = append(schedule, game)
+		games = append(games, game)
 	}
 	return err
 }
