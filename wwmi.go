@@ -4,16 +4,27 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
-// The master schedule
-var games []Game
+// The master game list
+var games Games
 
 // The master team list
 var teams map[string]Team
+
+// Games
+type Games []*Game
+
+func (g Games) Len() int      { return len(g) }
+func (g Games) Swap(i, j int) { g[i], g[j] = g[j], g[i] }
+
+type GamesByDate struct{ Games }
+
+func (g GamesByDate) Less(i, j int) bool { return g.Games[i].Date.Before(g.Games[j].Date) }
 
 // A specific game
 type Game struct {
@@ -47,7 +58,7 @@ type Result struct {
 }
 
 func init() {
-	games = make([]Game, 0, 100)
+	games = make([]*Game, 0, 100)
 	teams = make(map[string]Team)
 }
 
@@ -91,6 +102,7 @@ func WillWeMakeIt(team string) {
 		fmt.Printf("%v, %v\n", strings.Title(v.Name), v.Points)
 	}
 
+	sort.Sort(GamesByDate{games})
 	for _, g := range games {
 		if g.Date.After(time.Now()) {
 			fmt.Printf("%v at %v, %v\n", strings.Title(g.Away), strings.Title(g.Home), g.Date)
@@ -145,7 +157,7 @@ func readSchedule(filename string) error {
 		// remove the '\n' from the end of the line
 		line = line[:len(line)-1]
 
-		game := Game{}
+		game := &Game{}
 
 		// Split line into game values
 		gameString := strings.Split(line, "\t")
